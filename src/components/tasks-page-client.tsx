@@ -241,7 +241,7 @@ const TasksPageClient = ({ taskList, user }: TasksPageClientProps) => {
       <footer className="text-center pb-4">
         <p className="text-sm text-gray-500">
           &copy; {new Date().getFullYear()} - Desenvolvido por{" "}
-          <a href="https://w.app/r51ogj" className="text-blue-500">
+          <a href="https://w.app/r51ogj" target="_blank" className="text-blue-500">
             Agnaldo Korb
           </a>
         </p>
