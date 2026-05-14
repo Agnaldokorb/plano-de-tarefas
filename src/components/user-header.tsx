@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/utils/supabase-client";
-import { LogOut, User } from "lucide-react";
+import { LogOut } from "lucide-react";
 
 type UserHeaderProps = {
   user?: {
