@@ -8,11 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { ChevronLeft } from "lucide-react";
+import { upsertUser } from "@/actions/upsert-user";
 
 const SignupPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const router = useRouter();
@@ -21,7 +23,10 @@ const SignupPage = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!email || !password || !confirmPassword) {
+    const trimmedEmail = email.trim().toLowerCase();
+    const trimmedPhone = phone.trim();
+
+    if (!trimmedEmail || !trimmedPhone || !password || !confirmPassword) {
       setError("Por favor, preencha todos os campos");
       return;
     }
@@ -40,16 +45,35 @@ const SignupPage = () => {
       setIsLoading(true);
       setError(null);
 
-      const { error: authError } = await supabase.auth.signUp({
-        email,
+      const { data, error: authError } = await supabase.auth.signUp({
+        email: trimmedEmail,
         password,
         options: {
+          data: {
+            phone: trimmedPhone,
+          },
           emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/auth/callback`,
         },
       });
 
       if (authError) {
         setError(authError.message);
+        return;
+      }
+
+      if (!data.user?.id) {
+        setError("Não foi possível obter o ID do usuário criado");
+        return;
+      }
+
+      const userResult = await upsertUser({
+        id: data.user.id,
+        email: data.user.email || trimmedEmail,
+        phone: trimmedPhone,
+      });
+
+      if (!userResult.success) {
+        setError(userResult.error ?? "Erro ao salvar usuário no banco");
         return;
       }
 
@@ -93,6 +117,20 @@ const SignupPage = () => {
                 placeholder="seu@email.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+                className="mt-1"
+              />
+            </div>
+
+            <div>
+              <label className="text-sm font-medium text-gray-700">
+                Telefone
+              </label>
+              <Input
+                type="tel"
+                placeholder="(00) 00000-0000"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
                 disabled={isLoading}
                 className="mt-1"
               />

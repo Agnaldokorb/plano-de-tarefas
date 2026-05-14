@@ -22,3 +22,14 @@ model Tasks {
 
   @@index([userId])
 }
+
+model User {
+  id        String   @id // Supabase user ID
+  phone     String?
+  email     String   @unique
+  done      Boolean  @default(true)
+  createdAt DateTime @default(now())
+
+  @@index([id])
+}
+
