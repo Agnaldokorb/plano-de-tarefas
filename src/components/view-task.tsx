@@ -9,14 +9,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Eye } from "lucide-react";
+import { CalendarClock, Eye } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { formatTaskDateTime } from "@/lib/task-date-time";
 
 type ViewTaskProps = {
   id: string;
   task: string;
   description: string;
   done: boolean;
+  scheduledAt: Date | null;
   createdAt: Date;
 };
 
@@ -25,6 +27,7 @@ const ViewTask = ({
   task,
   description,
   done,
+  scheduledAt,
   createdAt,
 }: ViewTaskProps) => {
   const [open, setOpen] = useState(false);
@@ -73,6 +76,18 @@ const ViewTask = ({
             </label>
             <p className="text-base mt-1 text-gray-700">
               {description || "Sem descrição"}
+            </p>
+          </div>
+
+          <Separator />
+
+          <div>
+            <label className="text-xs font-semibold text-gray-500 uppercase">
+              Data e hora
+            </label>
+            <p className="mt-1 flex items-center gap-2 text-base text-gray-700">
+              <CalendarClock className="size-4 text-gray-500" />
+              {formatTaskDateTime(scheduledAt)}
             </p>
           </div>
 

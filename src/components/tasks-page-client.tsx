@@ -13,6 +13,7 @@ import {
   CheckCheck,
   ListChecks,
   View,
+  CalendarClock,
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import EditTask from "@/components/edit-task";
@@ -22,12 +23,15 @@ import ClearTasks from "@/components/clear-tasks";
 import UserHeader from "@/components/user-header";
 import { NewTask } from "@/actions/add-task";
 import { toggleTaskDone } from "@/actions/toggle-task-done";
+import { DatePickerTime } from "./date-time";
+import { combineTaskDateTime, formatTaskDateTime } from "@/lib/task-date-time";
 
 type Task = {
   id: string;
   task: string;
   description: string;
   done: boolean;
+  scheduledAt: Date | null;
   createdAt: Date;
 };
 
@@ -47,6 +51,8 @@ type FilterType = "todas" | "nao-concluidas" | "concluidas";
 const TasksPageClient = ({ taskList, user }: TasksPageClientProps) => {
   const [task, setTask] = useState("");
   const [description, setDescription] = useState("");
+  const [scheduledDate, setScheduledDate] = useState<Date | undefined>();
+  const [scheduledTime, setScheduledTime] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [isTogglingId, setIsTogglingId] = useState<string | null>(null);
   const [filterType, setFilterType] = useState<FilterType>("todas");
@@ -73,9 +79,16 @@ const TasksPageClient = ({ taskList, user }: TasksPageClientProps) => {
     setIsCreating(true);
 
     try {
-      await NewTask(trimmedTask, description.trim(), user.id);
+      await NewTask(
+        trimmedTask,
+        description.trim(),
+        user.id,
+        combineTaskDateTime(scheduledDate, scheduledTime),
+      );
       setTask("");
       setDescription("");
+      setScheduledDate(undefined);
+      setScheduledTime("");
       router.refresh();
     } finally {
       setIsCreating(false);
@@ -120,6 +133,12 @@ const TasksPageClient = ({ taskList, user }: TasksPageClientProps) => {
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
+            <DatePickerTime
+              date={scheduledDate}
+              time={scheduledTime}
+              onDateChange={setScheduledDate}
+              onTimeChange={setScheduledTime}
+            />
             <Button
               variant="default"
               className="cursor-pointer w-full"
@@ -160,23 +179,31 @@ const TasksPageClient = ({ taskList, user }: TasksPageClientProps) => {
             {filteredTaskList.map((item) => (
               <div className="mt-4 border-b-2" key={item.id}>
                 <div
-                  className="h-10 flex items-center justify-between border-t-2 cursor-pointer"
+                  className="min-h-12 flex items-stretch justify-between border-t-2 cursor-pointer"
                   onClick={() => handleToggleDone(item.id, item.done)}
                   role="button"
                   aria-pressed={item.done}
                 >
                   <div
-                    className={`w-1 h-full ${item.done ? "bg-green-500" : "bg-red-500"}`}
+                    className={`w-1 self-stretch ${item.done ? "bg-green-500" : "bg-red-500"}`}
                   ></div>
-                  <p
-                    className={`flex-1 px-2 ${
-                      item.done ? "line-through text-gray-500" : "text-black"
-                    }`}
-                  >
-                    {item.task}
-                  </p>
+                  <div className="flex-1 px-2 py-1">
+                    <p
+                      className={
+                        item.done ? "line-through text-gray-500" : "text-black"
+                      }
+                    >
+                      {item.task}
+                    </p>
+                    {item.scheduledAt && (
+                      <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
+                        <CalendarClock className="size-3.5" />
+                        {formatTaskDateTime(item.scheduledAt)}
+                      </p>
+                    )}
+                  </div>
                   <div
-                    className="flex items-center gap-3"
+                    className="flex items-center gap-3 pr-1"
                     onClick={(e) => e.stopPropagation()}
                   >
                     <ViewTask
@@ -184,12 +211,14 @@ const TasksPageClient = ({ taskList, user }: TasksPageClientProps) => {
                       task={item.task}
                       description={item.description}
                       done={item.done}
+                      scheduledAt={item.scheduledAt}
                       createdAt={item.createdAt}
                     />
                     <EditTask
                       id={item.id}
                       task={item.task}
                       description={item.description}
+                      scheduledAt={item.scheduledAt}
                       userId={user?.id || ""}
                     />
                     <DelitTask

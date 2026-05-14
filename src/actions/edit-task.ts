@@ -1,12 +1,14 @@
 "use server";
 
 import { prisma } from "@/utils/prisma";
+import { parseTaskDateTime } from "@/lib/task-date-time";
 
 export const EditTask = async (
   taskId: string,
   task: string,
   description: string,
   userId: string,
+  scheduledAt?: string | null,
 ) => {
   if (!userId) {
     console.error("userId is required");
@@ -26,7 +28,13 @@ export const EditTask = async (
 
     const newTask = await prisma.tasks.update({
       where: { id: taskId },
-      data: { task, description },
+      data: {
+        task,
+        description,
+        ...(scheduledAt !== undefined
+          ? { scheduledAt: parseTaskDateTime(scheduledAt) }
+          : {}),
+      },
     });
     return newTask;
   } catch (error) {

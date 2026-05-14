@@ -13,18 +13,27 @@ import { Save, SquarePen } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { EditTask as editTaskAction } from "@/actions/edit-task";
+import { DatePickerTime } from "@/components/date-time";
+import { combineTaskDateTime, toTimeInputValue } from "@/lib/task-date-time";
 
 type EditTaskProps = {
   id: string;
   task: string;
   description: string;
+  scheduledAt: Date | null;
   userId: string;
 };
 
-const EditTask = ({ id, task, description, userId }: EditTaskProps) => {
+const EditTask = ({ id, task, description, scheduledAt, userId }: EditTaskProps) => {
   const [open, setOpen] = useState(false);
   const [taskValue, setTaskValue] = useState(task);
   const [descriptionValue, setDescriptionValue] = useState(description);
+  const [scheduledDate, setScheduledDate] = useState<Date | undefined>(
+    scheduledAt ? new Date(scheduledAt) : undefined,
+  );
+  const [scheduledTime, setScheduledTime] = useState(
+    toTimeInputValue(scheduledAt),
+  );
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
 
@@ -38,7 +47,13 @@ const EditTask = ({ id, task, description, userId }: EditTaskProps) => {
     setIsSaving(true);
 
     try {
-      await editTaskAction(id, trimmedTask, descriptionValue.trim(), userId);
+      await editTaskAction(
+        id,
+        trimmedTask,
+        descriptionValue.trim(),
+        userId,
+        combineTaskDateTime(scheduledDate, scheduledTime),
+      );
       setOpen(false);
       router.refresh();
     } finally {
@@ -52,6 +67,8 @@ const EditTask = ({ id, task, description, userId }: EditTaskProps) => {
     if (nextOpen) {
       setTaskValue(task);
       setDescriptionValue(description);
+      setScheduledDate(scheduledAt ? new Date(scheduledAt) : undefined);
+      setScheduledTime(toTimeInputValue(scheduledAt));
     }
   };
 
@@ -73,6 +90,12 @@ const EditTask = ({ id, task, description, userId }: EditTaskProps) => {
               placeholder="Digite a descrição da tarefa"
               value={descriptionValue}
               onChange={(e) => setDescriptionValue(e.target.value)}
+            />
+            <DatePickerTime
+              date={scheduledDate}
+              time={scheduledTime}
+              onDateChange={setScheduledDate}
+              onTimeChange={setScheduledTime}
             />
             <Button
               variant="default"

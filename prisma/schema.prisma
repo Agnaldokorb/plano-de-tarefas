@@ -12,15 +12,13 @@ datasource db {
 }
 
 model Tasks {
-  id          String   @id @default(cuid())
-  userId      String   // Supabase user ID
+  id          String    @id @default(cuid())
+  userId      String // Supabase user ID
   task        String
   description String
-  done        Boolean  @default(false)
-  createdAt   DateTime @default(now())
+  done        Boolean   @default(false)
+  scheduledAt DateTime?
+  createdAt   DateTime  @default(now())
 
   @@index([userId])
-} 
-
-
-
+}
