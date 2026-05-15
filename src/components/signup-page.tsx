@@ -13,6 +13,7 @@ import { upsertUser } from "@/actions/upsert-user";
 const SignupPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [password, setPassword] = useState("");
@@ -23,10 +24,17 @@ const SignupPage = () => {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const trimmedName = name.trim();
     const trimmedEmail = email.trim().toLowerCase();
     const trimmedPhone = phone.trim();
 
-    if (!trimmedEmail || !trimmedPhone || !password || !confirmPassword) {
+    if (
+      !trimmedName ||
+      !trimmedEmail ||
+      !trimmedPhone ||
+      !password ||
+      !confirmPassword
+    ) {
       setError("Por favor, preencha todos os campos");
       return;
     }
@@ -50,6 +58,8 @@ const SignupPage = () => {
         password,
         options: {
           data: {
+            full_name: trimmedName,
+            name: trimmedName,
             phone: trimmedPhone,
           },
           emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"}/auth/callback`,
@@ -68,6 +78,7 @@ const SignupPage = () => {
 
       const userResult = await upsertUser({
         id: data.user.id,
+        name: trimmedName,
         email: data.user.email || trimmedEmail,
         phone: trimmedPhone,
       });
@@ -110,6 +121,18 @@ const SignupPage = () => {
           )}
 
           <form onSubmit={handleSignup} className="space-y-4">
+            <div>
+              <label className="text-sm font-medium text-gray-700">Nome</label>
+              <Input
+                type="text"
+                placeholder="Seu nome"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                disabled={isLoading}
+                className="mt-1"
+              />
+            </div>
+
             <div>
               <label className="text-sm font-medium text-gray-700">Email</label>
               <Input

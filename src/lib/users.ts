@@ -2,8 +2,13 @@ import { prisma } from "@/utils/prisma";
 
 type UpsertUserProfileInput = {
   id: string;
+  name: string;
   email: string;
   phone?: string | null;
+};
+
+const normalizeName = (name: string) => {
+  return name.trim();
 };
 
 const normalizePhone = (phone?: string | null) => {
@@ -13,23 +18,27 @@ const normalizePhone = (phone?: string | null) => {
 
 export const upsertUserProfile = async ({
   id,
+  name,
   email,
   phone,
 }: UpsertUserProfileInput) => {
+  const normalizedName = normalizeName(name);
   const normalizedEmail = email.trim().toLowerCase();
 
-  if (!id || !normalizedEmail) {
-    throw new Error("ID e email do usuário são obrigatórios");
+  if (!id || !normalizedName || !normalizedEmail) {
+    throw new Error("ID, nome e email do usuário são obrigatórios");
   }
 
   return prisma.user.upsert({
     where: { id },
     update: {
+      name: normalizedName,
       email: normalizedEmail,
       phone: normalizePhone(phone),
     },
     create: {
       id,
+      name: normalizedName,
       email: normalizedEmail,
       phone: normalizePhone(phone),
     },
