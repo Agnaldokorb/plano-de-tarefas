@@ -87,7 +87,7 @@ const ViewTask = ({
             </label>
             <p className="mt-1 flex items-center gap-2 text-base text-gray-700">
               <CalendarClock className="size-4 text-gray-500" />
-              {formatTaskDateTime(scheduledAt)}
+              <span suppressHydrationWarning>{formatTaskDateTime(scheduledAt)}</span>
             </p>
           </div>
 
@@ -122,7 +122,7 @@ const ViewTask = ({
               Criada em
             </label>
             <p className="text-base mt-1 text-gray-700">
-              {formatDate(createdAt)}
+              <span suppressHydrationWarning>{formatDate(createdAt)}</span>
             </p>
           </div>
 

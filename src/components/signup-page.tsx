@@ -215,7 +215,7 @@ const SignupPage = () => {
 
       <footer className="absolute bottom-4 text-white text-sm">
         <p>
-          &copy; {new Date().getFullYear()} - Desenvolvido por{" "}
+          &copy; <span suppressHydrationWarning>{new Date().getFullYear()}</span> - Desenvolvido por{" "}
           <a
             href="mailto:agnaldokorb@gmail.com"
             className="underline hover:no-underline"

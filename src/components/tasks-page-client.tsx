@@ -207,7 +207,9 @@ const TasksPageClient = ({
                     {item.scheduledAt && (
                       <p className="mt-0.5 flex items-center gap-1 text-xs text-gray-500">
                         <CalendarClock className="size-3.5" />
-                        {formatTaskDateTime(item.scheduledAt)}
+                        <span suppressHydrationWarning>
+                          {formatTaskDateTime(item.scheduledAt)}
+                        </span>
                       </p>
                     )}
                   </div>
@@ -279,7 +281,7 @@ const TasksPageClient = ({
 
       <footer className="text-center pb-4">
         <p className="text-sm text-gray-500">
-          &copy; {new Date().getFullYear()} - Desenvolvido por{" "}
+          &copy; <span suppressHydrationWarning>{new Date().getFullYear()}</span> - Desenvolvido por{" "}
           <a
             href="https://w.app/r51ogj"
             target="_blank"
