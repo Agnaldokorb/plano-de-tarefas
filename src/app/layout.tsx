@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Plano de tarefas",
   description:
-    "Aplicação para gerenciamento de tarefas, feita com Next.js 13, Tailwind CSS e TypeScript.",
+    "Aplicação para gerenciamento de tarefas.",
   icons: "favicon.svg",
 };
 

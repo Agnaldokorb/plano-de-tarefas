@@ -44,11 +44,21 @@ type TasksPageClientProps = {
       full_name?: string;
     };
   };
+  userProfile?: {
+    id: string;
+    name: string;
+    email: string;
+    phone: string | null;
+  } | null;
 };
 
 type FilterType = "todas" | "nao-concluidas" | "concluidas";
 
-const TasksPageClient = ({ taskList, user }: TasksPageClientProps) => {
+const TasksPageClient = ({
+  taskList,
+  user,
+  userProfile,
+}: TasksPageClientProps) => {
   const [task, setTask] = useState("");
   const [description, setDescription] = useState("");
   const [scheduledDate, setScheduledDate] = useState<Date | undefined>();
@@ -115,7 +125,7 @@ const TasksPageClient = ({ taskList, user }: TasksPageClientProps) => {
 
   return (
     <main className="w-full h-screen bg-gray-100 flex flex-col">
-      <UserHeader user={user} />
+      <UserHeader user={user} userProfile={userProfile} />
 
       <div className="flex-1 flex flex-col justify-center items-center p-4">
         <Card className="w-full max-w-2xl">
@@ -182,7 +192,6 @@ const TasksPageClient = ({ taskList, user }: TasksPageClientProps) => {
                   className="min-h-12 flex items-stretch justify-between border-t-2 cursor-pointer"
                   onClick={() => handleToggleDone(item.id, item.done)}
                   role="button"
-                  aria-pressed={item.done}
                 >
                   <div
                     className={`w-1 self-stretch ${item.done ? "bg-green-500" : "bg-red-500"}`}
@@ -254,7 +263,8 @@ const TasksPageClient = ({ taskList, user }: TasksPageClientProps) => {
               <div
                 className="h-full bg-green-400 rounded-2xl"
                 style={{ width: `${completionPercentage}%` }}
-              ></div>
+              >                
+              </div>
             </div>
 
             <div className="flex justify-end items-center mt-4">
@@ -270,7 +280,12 @@ const TasksPageClient = ({ taskList, user }: TasksPageClientProps) => {
       <footer className="text-center pb-4">
         <p className="text-sm text-gray-500">
           &copy; {new Date().getFullYear()} - Desenvolvido por{" "}
-          <a href="https://w.app/r51ogj" target="_blank" className="text-blue-500">
+          <a
+            href="https://w.app/r51ogj"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-blue-500"
+          >
             Agnaldo Korb
           </a>
         </p>

@@ -1,3 +1,4 @@
 {
-  "github.copilot.chat.localeOverride": "pt-br"
+  "github.copilot.chat.localeOverride": "pt-br",
+  "chat.fontSize": 15
 }

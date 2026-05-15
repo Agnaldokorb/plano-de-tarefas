@@ -7,6 +7,13 @@ type UpsertUserProfileInput = {
   phone?: string | null;
 };
 
+export type UserProfile = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+};
+
 const normalizeName = (name: string) => {
   return name.trim();
 };
@@ -41,6 +48,24 @@ export const upsertUserProfile = async ({
       name: normalizedName,
       email: normalizedEmail,
       phone: normalizePhone(phone),
+    },
+  });
+};
+
+export const getUserProfileById = async (
+  id: string,
+): Promise<UserProfile | null> => {
+  if (!id) {
+    return null;
+  }
+
+  return prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
     },
   });
 };
